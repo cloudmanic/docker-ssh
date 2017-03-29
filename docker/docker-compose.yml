@@ -5,9 +5,9 @@ services:
   # App
   ssh:
 
-    hostname: matthews-etc.com
+    hostname: example.com
 
-    container_name: ssh.matthews-etc.com
+    container_name: ssh.example.com
 
     build:
       context: ./build
@@ -17,19 +17,13 @@ services:
         P_GID: 20
         P_SSH_PASSWORD: foobar         
     
-    image: matthews-etc.com/sshd
+    image: example.com/sshd
 
     #restart: always
     
     ports:
       - "8822:22"  
-
-    environment:   
-      #VIRTUAL_HOST: matthews-etc.com, www.matthews-etc.com
-      #LETSENCRYPT_HOST: matthews-etc.com, www.matthews-etc.com
-      #LETSENCRYPT_EMAIL: support@cloudmanic.com
-      NR_APP_NAME: matthews-etc.com
-  
+      
     volumes:
       - ../www:/www:rw
       
