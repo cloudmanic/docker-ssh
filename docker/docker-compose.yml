@@ -1,0 +1,42 @@
+version: '2.1'
+
+services:
+
+  # App
+  ssh:
+
+    hostname: matthews-etc.com
+
+    container_name: ssh.matthews-etc.com
+
+    build:
+      context: ./build
+      dockerfile: Dockerfile-ssh
+      args:
+        P_UID: 501
+        P_GID: 20
+        P_SSH_PASSWORD: foobar         
+    
+    image: matthews-etc.com/sshd
+
+    #restart: always
+    
+    ports:
+      - "8822:22"  
+
+    environment:   
+      #VIRTUAL_HOST: matthews-etc.com, www.matthews-etc.com
+      #LETSENCRYPT_HOST: matthews-etc.com, www.matthews-etc.com
+      #LETSENCRYPT_EMAIL: support@cloudmanic.com
+      NR_APP_NAME: matthews-etc.com
+  
+    volumes:
+      - ../www:/www:rw
+      
+    networks:
+      - shared
+  
+networks:
+  shared:
+    external:
+      name: shared         

@@ -1,0 +1,42 @@
+FROM alpine:3.5
+
+MAINTAINER Spicer Mathtews <spicer@cloudmanic.com>
+
+ARG P_UID=0
+ARG P_GID=0
+ARG P_SSH_PASSWORD=foobar
+
+# Install required packages
+RUN apk add --no-cache openssh-client openssh tar git curl bash vim pwgen
+
+# Start the ssh keys
+RUN set -x && ssh-keygen -A
+
+# Reset Password and group files
+RUN set -x \
+      && echo "root:x:0:0:root:/root:/bin/ash" > /etc/passwd \
+      && echo "sshd:x:27:27:sshd:/var/empty:/sbin/nologin" >> /etc/passwd \      
+      && echo "root:::0:::::" > /etc/shadow \
+      && echo "root:x:0:root" > /etc/group \
+      && echo "sshd:x:27:sshd" >> /etc/group       
+      
+# Ensure www-data user exists (as our local user)
+RUN set -x \ 
+  && addgroup -g ${P_GID} -S www-data \
+  && adduser -u ${P_UID} -D -S -G www-data -h /www -s /bin/bash www-data 
+
+# Set the password for this user.
+RUN set -x && echo "www-data:$P_SSH_PASSWORD" | chpasswd
+
+# Copy over custom nginx config
+COPY start.sh /start.sh
+RUN set -x && chmod 755 /start.sh
+
+# Expose ssh port
+EXPOSE 22
+
+# Working directory
+WORKDIR /www  
+
+# Start the server
+CMD ["/start.sh"]
